@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./playlist_analyzer.db
+      - REDIS_URL=redis://redis:6379
+      - STORAGE_PATH=/app/downloads
+      - CORS_ORIGINS=["http://localhost:3000"]
+    env_file:
+      - .env
+    volumes:
+      - downloads_data:/app/downloads
+      - db_data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: rq worker --url redis://redis:6379 downloads
+    environment:
+      - DATABASE_URL=sqlite:///./playlist_analyzer.db
+      - REDIS_URL=redis://redis:6379
+      - STORAGE_PATH=/app/downloads
+    env_file:
+      - .env
+    volumes:
+      - downloads_data:/app/downloads
+      - db_data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  redis_data:
+  downloads_data:
+  db_data:

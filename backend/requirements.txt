@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+yt-dlp
+rq
+redis
+sqlalchemy
+aiosqlite
+pydantic-settings
+python-dotenv
+slowapi
+aiofiles
+python-multipart
+httpx
