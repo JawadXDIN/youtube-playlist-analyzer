@@ -89,29 +89,6 @@ docker compose up --build
 
 ---
 
-## 🌐 Free Live Deployment Guide
-
-You can deploy this application for free using **Render** (Backend) and **Vercel** (Frontend).
-
-### Step 1: Deploy Backend on [Render](https://render.com)
-1. Create a new **Web Service** and connect your GitHub repository.
-2. Configure the service:
-   - **Root Directory:** `backend`
-   - **Environment:** `Python 3`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-3. Add Environment Variable:
-   - `CORS_ORIGINS`: `["https://your-frontend.vercel.app"]`
-4. Copy the live backend URL (e.g. `https://your-backend.onrender.com`).
-
-### Step 2: Deploy Frontend on [Vercel](https://vercel.com)
-1. Import your GitHub repository on Vercel.
-2. Configure the project:
-   - **Root Directory:** `frontend`
-   - **Framework Preset:** `Next.js`
-3. Add Environment Variable:
-   - `NEXT_PUBLIC_API_URL`: `https://your-backend.onrender.com` (your Render backend URL)
-4. Click **Deploy**.
 
 ---
 
